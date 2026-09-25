@@ -124,7 +124,14 @@ def normalize_alert(raw: dict[str, Any], *, scenario: str, line_number: int = 0)
     )
     source_port = _port(_first(raw, "data.src_port", "data.srcport", "src_port", "source.port"))
     destination_port = _port(
-        _first(\n            raw,\n            "data.dest_port",\n            "data.dst_port",\n            "data.dstport",\n            "dest_port",\n            "destination.port",\n        )
+        _first(
+            raw,
+            "data.dest_port",
+            "data.dst_port",
+            "data.dstport",
+            "dest_port",
+            "destination.port",
+        )
     )
     host = _string(_first(raw, "agent.name", "predecoder.hostname", "host.name", "hostname"))
     location = _string(_first(raw, "location", "data.location"))

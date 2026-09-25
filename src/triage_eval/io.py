@@ -3,11 +3,8 @@ from __future__ import annotations
 import json
 from collections.abc import Iterable, Iterator
 from pathlib import Path
-from typing import TypeVar
 
 from pydantic import BaseModel
-
-T = TypeVar("T", bound=BaseModel)
 
 
 def write_jsonl(
@@ -20,7 +17,7 @@ def write_jsonl(
             handle.write(item.model_dump_json() + "\n")
 
 
-def read_jsonl(
+def read_jsonl[T: BaseModel](
     path: Path,
     model: type[T],
 ) -> Iterator[T]:
@@ -47,6 +44,11 @@ def write_json(
         else value
     )
     path.write_text(
-        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        json.dumps(
+            payload,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
         encoding="utf-8",
     )
