@@ -1,12 +1,19 @@
-# Explicit attacker addresses are required for labeling. Keep these values tied
-# to public AIT testbed metadata and document every update in docs/labeling.md.
-# Empty lists intentionally fail the label command rather than silently marking
-# every in-window alert benign.
-fox: []
-harrison: []
-russellmitchell: []
-santos: []
-shaw: []
-wardbeck: []
-wheeler: []
-wilson: []
+# Authoritative attacker default IPv4 addresses from the AIT authors'
+# public server_configs/<scenario>.yaml files in ait-aecid/alert-data-set.
+# See docs/labeling.md. Missing scenario mappings fail closed.
+fox:
+  - 192.168.130.77
+harrison:
+  - 172.28.192.242
+russellmitchell:
+  - 192.168.230.122
+santos:
+  - 10.229.2.216
+shaw:
+  - 10.70.33.202
+wardbeck:
+  - 192.168.96.3
+wheeler:
+  - 172.27.181.218
+wilson:
+  - 192.168.226.71
