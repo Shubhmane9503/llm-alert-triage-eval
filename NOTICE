@@ -1,0 +1,22 @@
+Third-party data and services
+=============================
+
+AIT Alert Data Set (AIT-ADS)
+----------------------------
+Copyright: Max Landauer, Florian Skopik, Markus Wurzenberger / AIT Austrian
+Institute of Technology.
+Record: https://zenodo.org/records/8263181
+DOI: 10.5281/zenodo.8263181
+License: Creative Commons Attribution 4.0 International (CC BY 4.0).
+
+This project downloads AIT-ADS from the original Zenodo record and does not
+redistribute it. The project performs normalization, grouping, and derived
+labeling. The GPL-3.0 scripts from the AIT alert-data-set repository are not
+included or reused; the loader in this repository is an independent
+implementation based on the public data format documentation.
+
+Microsoft GUIDE is a stretch-goal dataset and is not redistributed here.
+If enabled later, it must be attributed under CDLA-Permissive-2.0.
+
+Threat-intelligence provider responses are subject to their provider terms and
+must not be committed to this repository.

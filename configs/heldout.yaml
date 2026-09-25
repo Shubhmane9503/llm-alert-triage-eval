@@ -1,0 +1,22 @@
+schema_version: 1
+scenarios:
+  - harrison
+  - santos
+  - shaw
+  - wardbeck
+  - wheeler
+  - wilson
+group_window_seconds: 300
+random_seed: 20260925
+sample_size: 400
+processed_dir: data/processed/heldout
+labels_csv: data/raw/labels.csv
+attacker_hosts_file: configs/attacker_hosts.yaml
+baseline_config: results/baseline.json
+model:
+  provider: azure_openai
+  deployment_env: AZURE_OPENAI_DEPLOYMENT
+  endpoint_env: AZURE_OPENAI_ENDPOINT
+  api_key_env: AZURE_OPENAI_API_KEY
+  prompt: prompts/triage_v1.md
+  temperature: 0

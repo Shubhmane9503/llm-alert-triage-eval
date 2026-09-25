@@ -1,0 +1,12 @@
+# Explicit attacker addresses are required for labeling. Keep these values tied
+# to public AIT testbed metadata and document every update in docs/labeling.md.
+# Empty lists intentionally fail the label command rather than silently marking
+# every in-window alert benign.
+fox: []
+harrison: []
+russellmitchell: []
+santos: []
+shaw: []
+wardbeck: []
+wheeler: []
+wilson: []
