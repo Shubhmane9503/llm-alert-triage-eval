@@ -43,7 +43,9 @@ class NormalizedAlert(BaseModel):
     full_log: str | None = None
     url: str | None = None
     user_agent: str | None = None
-    raw: dict[str, Any]
+    signature: str | None = None
+    wrapper_rule_id: str | None = None
+    raw: dict[str, Any] | None = Field(default=None, exclude=True, repr=False)
 
     @field_validator("timestamp")
     @classmethod
