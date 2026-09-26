@@ -51,3 +51,19 @@ dataset's more precise event-level labels. Some malicious activity after initial
 access may be represented by internal victim traffic and therefore not contain
 the attacker's default IP. The manual check and reported label-error rate are
 required specifically to quantify this limitation instead of hiding it.
+
+
+## Rule-family refinement from dev validation
+
+A real dev-data diagnostic identified victim-side Wazuh rule families that do
+not carry the upstream event-label strings in their rendered alert text. Inside
+the published phase window and on a victim host, the following are treated as
+phase evidence:
+
+- privilege escalation: Wazuh 5304 (changed UID), 5402 (sudo to ROOT), 5501
+  (PAM session opened), and 5502 (PAM session closed);
+- service scans: Wazuh 5706 (sshd insecure connection attempt / scan).
+
+Generic TLS, mail, ClamAV and unrelated authentication alerts that happen to
+fall inside an attack window are not promoted to malicious solely by timing;
+they remain `uncertain` unless attacker/VPN IP or phase-family evidence exists.
