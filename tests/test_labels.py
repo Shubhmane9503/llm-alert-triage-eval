@@ -24,6 +24,14 @@ def _config() -> dict:
             "privilege_escalation": {
                 "attacker_change_user",
                 "escalated_sudo_command",
+                "5304",
+                "5402",
+                "5501",
+                "5502",
+                "user successfully changed uid",
+                "successful sudo to root executed",
+                "pam: login session opened",
+                "pam: login session closed",
             },
         },
     }
