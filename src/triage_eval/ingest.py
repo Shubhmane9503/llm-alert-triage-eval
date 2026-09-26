@@ -104,10 +104,10 @@ def _parse_endpoint(
                     raise IngestError(f"invalid IP endpoint: {value!r}") from exc
                 embedded_port = _port(candidate_port)
                 if embedded_port is None:
-                    raise IngestError(f"invalid endpoint port: {value!r}")
+                    raise IngestError(f"invalid endpoint port: {value!r}") from None
                 host = candidate_host
             else:
-                raise IngestError(f"invalid IP address: {value!r}")
+                raise IngestError(f"invalid IP address: {value!r}") from None
         else:
             host = str(parsed)
 
