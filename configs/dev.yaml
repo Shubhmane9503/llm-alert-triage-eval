@@ -1,0 +1,15 @@
+schema_version: 1
+scenarios:
+  - fox
+  - russellmitchell
+group_window_seconds: 300
+random_seed: 20260925
+processed_dir: data/processed/dev
+labels_csv: data/raw/labels.csv
+attacker_hosts_file: configs/attacker_hosts.yaml
+baseline:
+  threshold_min: 1
+  threshold_max: 15
+  fn_weight: 5.0
+  min_noise_support: 20
+  max_noise_malicious_rate: 0.0

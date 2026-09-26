@@ -1,0 +1,19 @@
+# Authoritative attacker default IPv4 addresses from the AIT authors'
+# public server_configs/<scenario>.yaml files in ait-aecid/alert-data-set.
+# See docs/labeling.md. Missing scenario mappings fail closed.
+fox:
+  - 192.168.130.77
+harrison:
+  - 172.28.192.242
+russellmitchell:
+  - 192.168.230.122
+santos:
+  - 10.229.2.216
+shaw:
+  - 10.70.33.202
+wardbeck:
+  - 192.168.96.3
+wheeler:
+  - 172.27.181.218
+wilson:
+  - 192.168.226.71
