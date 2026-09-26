@@ -8,6 +8,7 @@ from triage_eval.models import (
     BaselineParameters,
     Disposition,
     GroupLabel,
+    LabelStatus,
 )
 
 
@@ -48,7 +49,7 @@ def test_tuning_rejects_heldout_scenario(alert_factory) -> None:
     label = GroupLabel(
         group_id=group.group_id,
         scenario="harrison",
-        malicious=True,
+        status=LabelStatus.MALICIOUS,
     )
     with pytest.raises(ValueError, match="outside"):
         tune_baseline(

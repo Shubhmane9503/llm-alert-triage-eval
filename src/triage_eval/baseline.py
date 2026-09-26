@@ -57,9 +57,19 @@ def tune_baseline(
             "baseline tuning received a group outside the configured dev scenarios"
         )
 
+    labeled_groups = [
+        group
+        for group in group_list
+        if by_label[group.group_id].malicious is not None
+    ]
+    if not labeled_groups:
+        raise ValueError("cannot tune baseline with only uncertain labels")
+
     per_rule: dict[str, list[bool]] = defaultdict(list)
-    for group in group_list:
-        per_rule[group.rule_id].append(by_label[group.group_id].malicious)
+    for group in labeled_groups:
+        malicious = by_label[group.group_id].malicious
+        assert malicious is not None
+        per_rule[group.rule_id].append(malicious)
 
     noise = sorted(
         rule_id
@@ -68,7 +78,10 @@ def tune_baseline(
         and (sum(values) / len(values)) <= max_noise_malicious_rate
     )
 
-    y_true = [by_label[group.group_id].malicious for group in group_list]
+    y_true = [
+        bool(by_label[group.group_id].malicious)
+        for group in labeled_groups
+    ]
     best: tuple[float, float, int] | None = None
     best_threshold = threshold_min
 
@@ -77,7 +90,7 @@ def tune_baseline(
         y_pred = [
             group.rule_id not in noise_set
             and group.representative.rule_level >= threshold
-            for group in group_list
+            for group in labeled_groups
         ]
         fn_rate, fp_rate = _rates(y_true, y_pred)
         score = fn_weight * fn_rate + fp_rate

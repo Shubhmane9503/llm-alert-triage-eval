@@ -15,7 +15,7 @@ from .io import read_jsonl, write_json, write_jsonl
 from .labels import (
     label_groups,
     load_attack_windows,
-    load_attacker_hosts,
+    load_labeling_config,
     write_manual_check_sample,
 )
 from .models import AlertGroup, GroupLabel
@@ -54,10 +54,10 @@ def cmd_label(args: argparse.Namespace) -> None:
         read_jsonl(processed / "groups.jsonl", AlertGroup)
     )
     windows = load_attack_windows(Path(cfg["labels_csv"]))
-    attackers = load_attacker_hosts(
+    labeling_config = load_labeling_config(
         Path(cfg["attacker_hosts_file"])
     )
-    labels = label_groups(groups, windows, attackers)
+    labels = label_groups(groups, windows, labeling_config)
     write_jsonl(processed / "group_labels.jsonl", labels)
 
     write_manual_check_sample(
@@ -71,7 +71,9 @@ def cmd_label(args: argparse.Namespace) -> None:
         json.dumps(
             {
                 "groups": len(groups),
-                "malicious": sum(label.malicious for label in labels),
+                "malicious": sum(label.status.value == "malicious" for label in labels),
+                "benign": sum(label.status.value == "benign" for label in labels),
+                "uncertain": sum(label.status.value == "uncertain" for label in labels),
             }
         )
     )

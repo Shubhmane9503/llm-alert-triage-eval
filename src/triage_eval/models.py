@@ -18,6 +18,12 @@ class Disposition(StrEnum):
     NEEDS_MORE_DATA = "needs_more_data"
 
 
+class LabelStatus(StrEnum):
+    MALICIOUS = "malicious"
+    BENIGN = "benign"
+    UNCERTAIN = "uncertain"
+
+
 class NormalizedAlert(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -75,8 +81,15 @@ class AlertLabel(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     alert_id: str
-    malicious: bool
+    status: LabelStatus
     attack_phase: str | None = None
+    evidence: str | None = None
+
+    @property
+    def malicious(self) -> bool | None:
+        if self.status == LabelStatus.UNCERTAIN:
+            return None
+        return self.status == LabelStatus.MALICIOUS
 
 
 class GroupLabel(BaseModel):
@@ -84,9 +97,16 @@ class GroupLabel(BaseModel):
 
     group_id: str
     scenario: str
-    malicious: bool
+    status: LabelStatus
     attack_phases: list[str] = Field(default_factory=list)
     mixed_member_labels: bool = False
+    evidence: list[str] = Field(default_factory=list)
+
+    @property
+    def malicious(self) -> bool | None:
+        if self.status == LabelStatus.UNCERTAIN:
+            return None
+        return self.status == LabelStatus.MALICIOUS
 
 
 class Citation(BaseModel):
