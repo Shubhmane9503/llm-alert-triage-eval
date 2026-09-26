@@ -104,8 +104,9 @@ def test_outside_window_is_benign(alert_factory) -> None:
 def test_group_malicious_beats_uncertain(alert_factory) -> None:
     first = alert_factory(
         alert_id="a1",
-        source_ip="172.17.130.196",
+        source_ip="10.0.0.10",
         host="intranet",
+        rule_description="dirb scanner request",
     )
     second = alert_factory(
         alert_id="a2",
