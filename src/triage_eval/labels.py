@@ -258,6 +258,19 @@ def summarize_labels(
     }
 
 
+def _manual_sheet_has_labels(path: Path) -> bool:
+    if not path.exists():
+        return False
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        if "manual_label" not in (reader.fieldnames or []):
+            return False
+        return any(
+            str(row.get("manual_label", "")).strip()
+            for row in reader
+        )
+
+
 def write_manual_check_sample(
     groups: list[AlertGroup],
     labels: list[GroupLabel],
@@ -265,34 +278,73 @@ def write_manual_check_sample(
     *,
     n: int = 100,
     seed: int = 20260925,
+    force: bool = False,
+    min_in_window_non_malicious: int = 30,
 ) -> None:
     if len(groups) != len(labels):
         raise ValueError("groups and labels must have the same length")
+    if n < min_in_window_non_malicious:
+        raise ValueError(
+            "sample size is smaller than the required in-window reserve"
+        )
+    if _manual_sheet_has_labels(path) and not force:
+        raise FileExistsError(
+            f"{path} contains manual labels; refusing to overwrite. "
+            "Use --force only if discarding human review is intentional."
+        )
 
     by_id = {label.group_id: label for label in labels}
+    rng = random.Random(seed)
+
+    in_window_non_malicious = [
+        group
+        for group in groups
+        if by_id[group.group_id].status != LabelStatus.MALICIOUS
+        and by_id[group.group_id].attack_phases
+    ]
+    if len(in_window_non_malicious) < min_in_window_non_malicious:
+        raise ValueError(
+            "not enough in-window non-malicious/uncertain groups for "
+            f"manual review: need {min_in_window_non_malicious}, "
+            f"found {len(in_window_non_malicious)}"
+        )
+
+    selected = rng.sample(
+        in_window_non_malicious,
+        min_in_window_non_malicious,
+    )
+    selected_ids = {group.group_id for group in selected}
+
     strata: dict[tuple[str, str], list[AlertGroup]] = defaultdict(list)
     for group in groups:
+        if group.group_id in selected_ids:
+            continue
         label = by_id[group.group_id]
         strata[(group.scenario, label.status.value)].append(group)
 
-    rng = random.Random(seed)
-    selected: list[AlertGroup] = []
+    slots = n - len(selected)
     nonempty = [items for items in strata.values() if items]
-    if not nonempty:
-        raise ValueError("cannot sample from an empty group set")
+    if slots and not nonempty:
+        raise ValueError("cannot fill manual-check sample")
 
-    per_stratum = max(1, n // len(nonempty))
-    for items in nonempty:
-        chosen = (
-            items
-            if len(items) <= per_stratum
-            else rng.sample(items, per_stratum)
-        )
-        selected.extend(chosen)
+    if nonempty:
+        per_stratum = max(1, slots // len(nonempty))
+        for items in nonempty:
+            remaining_slots = n - len(selected)
+            if remaining_slots <= 0:
+                break
+            count = min(
+                per_stratum,
+                len(items),
+                remaining_slots,
+            )
+            selected.extend(rng.sample(items, count))
 
     selected_ids = {group.group_id for group in selected}
     remaining = [
-        group for group in groups if group.group_id not in selected_ids
+        group
+        for group in groups
+        if group.group_id not in selected_ids
     ]
     if len(selected) < n and remaining:
         selected.extend(
