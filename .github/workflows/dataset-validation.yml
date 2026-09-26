@@ -1,0 +1,45 @@
+name: dataset-validation
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/dataset-validation.yml"
+      - "src/triage_eval/**"
+      - "configs/**"
+
+permissions:
+  contents: read
+
+jobs:
+  dev-dataset:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install -e '.[dev]'
+      - name: Download AIT-ADS
+        run: .venv/bin/true 2>/dev/null || true; triage-eval data --output data
+      - name: Stream dev ingest with memory stats
+        run: /usr/bin/time -v triage-eval ingest --config configs/dev.yaml
+      - name: Derive labels
+        run: triage-eval label --config configs/dev.yaml
+      - name: Print label summary
+        run: |
+          cat data/processed/dev/label_summary.json
+          echo "--- manual sample overlap count ---"
+          python - <<'PY'
+          import csv
+          rows = list(csv.DictReader(open("labels/manual_check.csv", encoding="utf-8")))
+          overlap = [r for r in rows if r["attack_phases"] and r["derived_label"] != "malicious"]
+          print({"rows": len(rows), "in_window_non_malicious": len(overlap)})
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dev-label-validation
+          path: |
+            data/processed/dev/label_summary.json
+            labels/manual_check.csv
+          retention-days: 3
