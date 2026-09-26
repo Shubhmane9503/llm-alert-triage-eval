@@ -135,6 +135,8 @@ class DecisionResult(BaseModel):
     citations: list[Citation] = Field(default_factory=list)
     llm_unavailable: bool = False
     validation_error: str | None = None
+    fallback: bool = False
+    fallback_reason: str | None = None
     attempts: int = Field(ge=0, le=2)
 
 
@@ -187,4 +189,6 @@ class AuditRecord(BaseModel):
     validation_ok: bool
     validation_error: str | None = None
     llm_unavailable: bool
+    fallback: bool = False
+    fallback_reason: str | None = None
     attempt: Literal[1, 2]
