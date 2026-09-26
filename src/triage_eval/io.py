@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable, Iterator, Mapping
 from pathlib import Path
 
 from pydantic import BaseModel
@@ -35,7 +35,7 @@ def read_jsonl[T: BaseModel](
 
 def write_json(
     path: Path,
-    value: BaseModel | dict[str, object],
+    value: BaseModel | Mapping[str, object],
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = (
