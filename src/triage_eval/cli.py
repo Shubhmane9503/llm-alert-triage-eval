@@ -9,7 +9,7 @@ import yaml
 
 from .baseline import tune_baseline
 from .data import download_ait_ads
-from .group import group_alerts
+from .group import iter_group_alerts
 from .ingest import load_scenarios
 from .io import read_jsonl, write_json, write_jsonl
 from .labels import (
@@ -35,16 +35,30 @@ def cmd_data(args: argparse.Namespace) -> None:
 def cmd_ingest(args: argparse.Namespace) -> None:
     cfg = _config(args.config)
     raw_dir = Path(args.data_dir)
-    alerts = list(load_scenarios(raw_dir, cfg["scenarios"]))
     processed = Path(cfg["processed_dir"])
-    write_jsonl(processed / "alerts.jsonl", alerts)
+    processed.mkdir(parents=True, exist_ok=True)
+    alerts_path = processed / "alerts.jsonl"
+    groups_path = processed / "groups.jsonl"
+    alert_count = 0
+    group_count = 0
 
-    groups = group_alerts(
-        alerts,
-        window_seconds=int(cfg.get("group_window_seconds", 300)),
-    )
-    write_jsonl(processed / "groups.jsonl", groups)
-    print(json.dumps({"alerts": len(alerts), "groups": len(groups)}))
+    def counted_alerts():
+        nonlocal alert_count
+        with alerts_path.open("w", encoding="utf-8") as handle:
+            for alert in load_scenarios(raw_dir, cfg["scenarios"]):
+                handle.write(alert.model_dump_json() + "\n")
+                alert_count += 1
+                yield alert
+
+    with groups_path.open("w", encoding="utf-8") as handle:
+        for group in iter_group_alerts(
+            counted_alerts(),
+            window_seconds=int(cfg.get("group_window_seconds", 300)),
+        ):
+            handle.write(group.model_dump_json() + "\n")
+            group_count += 1
+
+    print(json.dumps({"alerts": alert_count, "groups": group_count}))
 
 
 def cmd_label(args: argparse.Namespace) -> None:
