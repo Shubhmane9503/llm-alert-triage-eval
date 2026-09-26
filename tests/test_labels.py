@@ -24,6 +24,14 @@ def _config() -> dict:
             "privilege_escalation": {
                 "attacker_change_user",
                 "escalated_sudo_command",
+                "5304",
+                "5402",
+                "5501",
+                "5502",
+                "user successfully changed uid",
+                "successful sudo to root executed",
+                "pam: login session opened",
+                "pam: login session closed",
             },
         },
     }
@@ -59,8 +67,9 @@ def test_host_only_privesc_rule_is_malicious(alert_factory) -> None:
         source_ip="10.0.0.22",
         destination_ip=None,
         host="intranet",
-        rule_description="attacker_change_user",
-        full_log="local privilege escalation event",
+        rule_id="5402",
+        rule_description="Successful sudo to ROOT executed.",
+        full_log="sudo: local privilege escalation event",
     )
     label = label_alert(
         alert,

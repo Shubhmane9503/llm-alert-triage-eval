@@ -26,7 +26,7 @@ phase_rules:
   network_scans:
     keywords: [dns_scan, network_scan, suricata]
   service_scans:
-    keywords: [service_scan, nmap, suricata]
+    keywords: [service_scan, nmap, suricata, "5706", "insecure connection attempt (scan)"]
   wpscan:
     keywords: [wpscan]
   dirb:
@@ -38,7 +38,17 @@ phase_rules:
   reverse_shell:
     keywords: [reverse_shell, reverse shell]
   privilege_escalation:
-    keywords: [attacker_change_user, escalated_sudo_command]
+    keywords:
+      - attacker_change_user
+      - escalated_sudo_command
+      - "5304"
+      - "5402"
+      - "5501"
+      - "5502"
+      - user successfully changed uid
+      - successful sudo to root executed
+      - pam: login session opened
+      - pam: login session closed
   service_stop:
     keywords: [service_stop, service stop]
   dnsteal:
