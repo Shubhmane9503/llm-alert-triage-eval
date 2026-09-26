@@ -36,6 +36,41 @@ jobs:
           overlap = [r for r in rows if r["attack_phases"] and r["derived_label"] != "malicious"]
           print({"rows": len(rows), "in_window_non_malicious": len(overlap)})
           PY
+      - name: Diagnose uncertain phase rule families
+        run: |
+          python - <<'PY'
+          import collections
+          import json
+
+          labels = {}
+          with open("data/processed/dev/group_labels.jsonl", encoding="utf-8") as handle:
+              for line in handle:
+                  row = json.loads(line)
+                  if row["status"] == "uncertain":
+                      labels[row["group_id"]] = row
+
+          by_phase = collections.defaultdict(collections.Counter)
+          with open("data/processed/dev/groups.jsonl", encoding="utf-8") as handle:
+              for line in handle:
+                  group = json.loads(line)
+                  label = labels.get(group["group_id"])
+                  if not label:
+                      continue
+                  rep = group["representative"]
+                  key = (
+                      rep["rule_id"],
+                      rep["rule_description"],
+                      rep.get("host"),
+                      rep.get("location"),
+                  )
+                  for phase in label["attack_phases"]:
+                      by_phase[phase][key] += 1
+
+          for phase in sorted(by_phase):
+              print(f"=== uncertain:{phase} ===")
+              for key, count in by_phase[phase].most_common(20):
+                  print(count, key)
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: dev-label-validation
