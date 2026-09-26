@@ -1,19 +1,45 @@
-# Authoritative attacker default IPv4 addresses from the AIT authors'
-# public server_configs/<scenario>.yaml files in ait-aecid/alert-data-set.
-# See docs/labeling.md. Missing scenario mappings fail closed.
-fox:
-  - 192.168.130.77
-harrison:
-  - 172.28.192.242
-russellmitchell:
-  - 192.168.230.122
-santos:
-  - 10.229.2.216
-shaw:
-  - 10.70.33.202
-wardbeck:
-  - 192.168.96.3
-wheeler:
-  - 172.27.181.218
-wilson:
-  - 192.168.226.71
+# Ground-truth derivation config.
+# attacker_ips includes both attacker_0 and the scenario VPN/NAT host because
+# victim-side Wazuh/Suricata alerts observe the attacker through that address.
+scenarios:
+  fox:
+    attacker_ips: [192.168.130.77, 172.17.130.196]
+  harrison:
+    attacker_ips: [172.28.192.242, 10.237.1.238]
+  russellmitchell:
+    attacker_ips: [192.168.230.122, 172.19.131.174]
+  santos:
+    attacker_ips: [10.229.2.216, 172.21.128.119]
+  shaw:
+    attacker_ips: [10.70.33.202, 172.24.249.224]
+  wardbeck:
+    attacker_ips: [192.168.96.3, 10.132.56.81]
+  wheeler:
+    attacker_ips: [172.27.181.218, 10.38.243.125]
+  wilson:
+    attacker_ips: [192.168.226.71, 10.182.193.78]
+
+# Phase-family keywords are derived from the upstream alert-data-set analysis
+# labels and testbed log names. They are only considered inside that phase's
+# published time window, and require a victim host to be present.
+phase_rules:
+  network_scans:
+    keywords: [dns_scan, network_scan, suricata]
+  service_scans:
+    keywords: [service_scan, nmap, suricata]
+  wpscan:
+    keywords: [wpscan]
+  dirb:
+    keywords: [dirb]
+  webshell:
+    keywords: [webshell_cmd, webshell]
+  cracking:
+    keywords: [crack_passwords, cracking]
+  reverse_shell:
+    keywords: [reverse_shell, reverse shell]
+  privilege_escalation:
+    keywords: [attacker_change_user, escalated_sudo_command]
+  service_stop:
+    keywords: [service_stop, service stop]
+  dnsteal:
+    keywords: [dnsteal]
