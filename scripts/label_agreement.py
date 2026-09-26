@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+from pathlib import Path
 import argparse
 import csv
 import json
 import math
-from pathlib import Path
 
 
 VALID_LABELS = {"malicious", "benign", "uncertain"}
