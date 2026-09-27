@@ -1,2 +1,37 @@
-# Populated in milestone 2 with public AIT testbed asset context.
-assets: []
+assets:
+  - name: intranet_server
+    aliases: [intranet]
+    addresses: []
+    role: Internal web and WordPress server
+    criticality: high
+    tags: [web, internal]
+  - name: mail
+    aliases: [mail_server]
+    addresses: []
+    role: Mail server
+    criticality: high
+    tags: [mail]
+  - name: internal_share
+    aliases: [share, file_share]
+    addresses: []
+    role: Internal file share
+    criticality: high
+    tags: [files]
+  - name: vpn
+    aliases: [vpn_server]
+    addresses: []
+    role: VPN gateway
+    criticality: critical
+    tags: [remote-access, perimeter]
+  - name: dns
+    aliases: [dns_server, inet-dns]
+    addresses: []
+    role: DNS service
+    criticality: high
+    tags: [dns]
+  - name: attacker-0
+    aliases: []
+    addresses: []
+    role: Simulated adversary host
+    criticality: low
+    tags: [testbed, adversary]
