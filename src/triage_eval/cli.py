@@ -16,6 +16,7 @@ from .labels import (
     label_groups,
     load_attack_windows,
     load_labeling_config,
+    summarize_labels,
     write_manual_check_sample,
 )
 from .models import AlertGroup, GroupLabel
@@ -73,6 +74,10 @@ def cmd_label(args: argparse.Namespace) -> None:
     )
     labels = label_groups(groups, windows, labeling_config)
     write_jsonl(processed / "group_labels.jsonl", labels)
+    write_json(
+        processed / "label_summary.json",
+        summarize_labels(labels),
+    )
 
     write_manual_check_sample(
         groups,
@@ -80,6 +85,7 @@ def cmd_label(args: argparse.Namespace) -> None:
         Path("labels/manual_check.csv"),
         n=100,
         seed=int(cfg.get("random_seed", 20260925)),
+        force=bool(args.force),
     )
     print(
         json.dumps(
@@ -173,6 +179,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--config",
         type=Path,
         default=Path("configs/dev.yaml"),
+    )
+    label_parser.add_argument(
+        "--force",
+        action="store_true",
+        help="overwrite a manual-check sheet that already contains human labels",
     )
     label_parser.set_defaults(func=cmd_label)
 
